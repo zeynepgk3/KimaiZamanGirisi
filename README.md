@@ -1,6 +1,6 @@
 # ⏱️ Kimai Timesheet CLI
 
-Kimai kullananlar için aylık timesheet girişlerini otomatikleştiren interaktif bir CLI aracı.
+Kimai kullananlar için aylık timesheet girişlerini otomatikleştiren interaktif bir CLI aracıdır. Amacı, zaman girişleri sırasında tekrarlanan gereksiz adımları ortadan kaldırarak asıl önemli olan iş açıklamalarına daha fazla vakit kazandırmaktır.
 
 -  Python ile çalıştır
 -  EXE olarak indir–çalıştır
@@ -8,85 +8,66 @@ Kimai kullananlar için aylık timesheet girişlerini otomatikleştiren interakt
 -  Ofis / ev günü etiketleme
 - Günlük açıklamaları interaktif sorar
 
-# 🚀 Hızlı Başlangıç (EXE)
+## 🚀 Hızlı Başlangıç (EXE)
+Python kurulumu ile uğraşmak istemiyorsanız,
 
-Python kurulu değil mi? Hiç sorun değil.
+1. dist/ klasörüne gidin
+2. KimaiZamanGirisi.exe dosyasını çalıştırın
+3. Terminalde sorulan bilgileri girin ve açıklamaları doldurun
 
-dist/ klasörüne git
-
-KimaiZamanGirisi.exe dosyasını çalıştır
-
-Terminalde sorulan bilgileri gir
-
-
-# 🐍 Python ile Çalıştırmak İsteyenler
+## 🐍 Python ile Çalıştırmak İsteyenler
 1. Repoyu klonla
 2. Bağımlılıkları kur
-pip install -r requirements.txt
+`pip install -r requirements.txt`
 3. Script’i çalıştır
-python src/kimai_script_with_desc.py
+`python src/kimai_script_with_desc.py`
 
-# 🧠 Script Ne Yapar?
+## 🧠 Script Ne Yapar?
 
 Script, içinde bulunulan ay için hafta içi günleri dolaşır ve her gün için uygun timesheet kayıtlarını Kimai’ye gönderir.
 
-# Otomatik yönetilen senaryolar
+## ⚙️ Otomatik yönetilen senaryolar
 
-## 🟥 Resmi tatiller (Türkiye)
-
+### 🏖️ Resmi tatiller (Türkiye)
 Gün boyu tek kayıt açılır. Aktivite otomatik olarak Resmi Tatil olur
 
-## 🟣 Sprint Planning günleri
+### 🚀 Sprint Planning günleri
 
-Kullanıcıdan girilen günler (ayın kaçında olduğu)
+Kullanıcıdan kendi ekibinin planlama günleri alınır. (ayın kaçında olduğu) Gün boyu tek kayıt atılır. Açıklaması: *Sprint Review + Sprint Planlama + Retrospective*
 
-Gün boyu tek kayıt: Sprint Review + Sprint Planlama + Retrospective
+### 💤 İzin günleri
 
-## 🟡 İzin günleri
+Gün boyu tek kayıt atılır. Aktivite: *İzinli*
 
-Gün boyu tek kayıt
+### 👩‍💻 Normal çalışma günleri
 
-Aktivite: İzinli
+**09:00–12:00** → öğleden öncesi için açıklama sorulur. Otomatik olarak “Daily Toplantısı, …” ile başlar
 
-## 🟢 Normal çalışma günleri
+**12:00–13:00** → öğle arası (aktivite id: 30)
 
-09:00–12:00 → açıklama sorulur
+**13:00–18:00** → öğleden sonrası için açıklama sorulur.
 
-Otomatik olarak “Daily Toplantısı, …” ile başlar
-
-12:00–13:00 → öğle arası (aktivite id: 30)
-
-13:00–18:00 → açıklama sorulur
-
-## 🏢 Ofis / Ev Günleri
+### 🏢 Ofis / Ev Günleri
 
 Script çalışırken ayrıca ofis günleri sorulur.
 
 Ofis günü olan tarihler için @ofis tag’i kullanılır
-
 Diğer günlerde Varsayılan tag (@ev) kullanılır
 
-Bu sayede Kimai tarafında:
+Bu sayede Kimai tarafında ofis / remote filtrelemesi ve raporlama çok daha kolay olur.
 
-ofis / remote filtrelemesi
-
-raporlama
-çok daha kolay olur.
-
-## 🧾 Bugün İçin Özel Davranış
+### 🧾 Bugün İçin Özel Davranış
 
 Eğer script bugün çalıştırılıyorsa:
 
 13:00–18:00 kaydının açıklamasına otomatik olarak
-“, Kimai Zaman Girişi” eklenir
+“, Kimai Zaman Girişi” eklenir. Sonuçta bu da bir iş.
 
-Bu, manuel girilen günlerle karışmaması için bilinçli bir tercihtir.
-
-# 🔐 Script Çalışırken Sorulan Bilgiler
+## 🔐 Script Çalışırken Sorulan Bilgiler
 
 Script çalışırken interaktif olarak şunları ister:
 
-▶️ Ayın kaçıncı gününden başlansın
+▶️ Ayın kaçıncı gününden başlansın (olur da farklı zamanlarda zaman girişi yapılmak istenirse zaten oluşturulmuş zaman girişlerini duplike etmemek için)
 
 🔑 Kimai _token
 
@@ -98,22 +79,22 @@ Script çalışırken interaktif olarak şunları ister:
 
 📌 Ofis günleri (örn: 1,5,12)
 
-Hiçbiri repoya hardcoded değildir
-Token ve session sadece runtime’da kullanılır 👍
+Hiçbiri repoya hardcoded değildir.
+Token ve session sadece runtime’da kullanılır.
 
-## Token ve Session Bilgisi
+### 🔑 Token ve Session Bilgisi
 
 Bu script **token ve session bilgilerini kalıcı olarak saklamaz**.  
 Tüm bilgiler **sadece runtime sırasında** kullanıcıdan alınır.
 
-### `_token` Nasıl Alınır?
+#### `_token` Nasıl Alınır?
 1. Kimai arayüzünü aç
 2. Yeni bir timesheet oluştur (Create)
 3. Tarayıcı DevTools → Network sekmesi
 4. Create request’ini aç
 5. Request **payload** içindeki `_token` değerini kopyala
 
-### `PHPSESSID` Nasıl Alınır?
+#### `PHPSESSID` Nasıl Alınır?
 1. Aynı request’te
 2. **Request Headers → Cookie**
 3. `PHPSESSID=...` değerini kopyala
@@ -122,25 +103,26 @@ Script çalışırken bu değerler terminal üzerinden sorulur ve **sadece o ça
 
 🔐 Güvenlik nedeniyle hiçbir bilgi dosyaya yazılmaz.
 
-# ⚠️ Önemli Notlar
+## ⚠️ Önemli Notlar
 
-Script hafta sonları için kayıt açmaz. Mesai yaparsanız zaman girişlerini manual girmeniz gerekecek.
-Öğle arası (12:00–13:00) açıklamasızdır.
-Ay bazlı çalışır (geçmiş / gelecek ay seçimi yoktur).
-Türkiye resmi tatilleri holidays kütüphanesiyle otomatik alınır.
+- Script hafta sonları için kayıt açmaz. Mesai yaparsanız zaman girişlerini manual girmeniz gerekecek.
+- Öğle arası (12:00–13:00) açıklamasızdır.
+- Ay bazlı çalışır (geçmiş / gelecek ay seçimi yoktur).
+- Türkiye resmi tatilleri holidays kütüphanesiyle otomatik alınır.
+- Her gün tamamlandıktan sonra kimai anasayfası güncellenip kayıtların başarılı şekilde oluştuğunu görüp diğer günlere devam edilmesi önerilir. 
 
-Her gün tamamlandıktan sonra kimai anasayfası güncellenip her kaydın başarılı şekilde oluştuğunu görüp diğer günlere devam edilmesi önerilir. 
-
-# 🛠️ EXE Build Etmek (Geliştiriciler İçin)
-pip install pyinstaller
-pyinstaller --onefile --console src/kimai_script_with_desc.py
+## 🛠️ EXE Build Etmek (Geliştiriciler İçin)
+    
+`python -m PyInstaller --onefile --console --name KimaiZamanGirisi --hidden-import=holidays --hidden-import=holidays.countries src/kimai_script_with_desc.py `
 
 Oluşan dosya:
 
-dist/kimai-timesheet-cli.exe
+**dist/KimaiZamanGirisi.exe**
 
-# 🤝 Katkı
+## 🤝 Katkı
 
-PR, issue ve önerilere tamamen açık 🙌
+PR, issue ve önerilere tamamen açık.
+
 Token ve PHPSESSIONID'yı kullanıcı adı ve parolası ile dinamik şekilde alabilecek bir geliştirme yapılabilir.
+
 Script özellikle kişisel akışlara göre kolayca özelleştirilebilir.
