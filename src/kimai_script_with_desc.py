@@ -1,3 +1,5 @@
+import sys
+import time
 import requests
 from datetime import datetime
 import calendar
@@ -8,6 +10,7 @@ import holidays
 # ============================
 KIMAI_URL = "https://kimai-new.finartz.dev/tr/timesheet/create"
 PHPSESSID = "will be overrided"
+MAX_ERROR_COUNT = 3
 
 DEFAULT_DATA = {
     "customer": 11,
@@ -28,7 +31,42 @@ COOKIES = {
 
 TODAY = datetime.now().date()
 
-tr_holidays = holidays.Turkey(years=2025)
+tr_holidays = holidays.Turkey(years=datetime.now().year)
+
+# ============================
+# ERROR HANDLING
+# ============================
+def handle_auth_error(payload, r):
+
+    print(
+        f"\n❌ {payload['timesheet_edit_form[begin]']} - "
+        f"{payload['timesheet_edit_form[end]']} zaman dilimi eklenemedi! "
+        f"(HTTP {r.status_code} - {r.text})"
+    )
+
+    print("\nNe yapmak istersin?")
+    print("1️⃣  Programı sonlandır")
+    print("2️⃣  Token ve Session ID yenile")
+
+    choice = input("Seçim (1/2): ").strip()
+
+    if choice == "1":
+        print("⛔ Program 3 saniye içinde kapatılıyor...")
+        time.sleep(3)
+        return "EXIT", None
+
+    elif choice == "2":
+        print("\n🔄 Token ve Session ID yenileniyor...")
+        new_token = ask_token()
+        new_session = ask_sessionid()
+        COOKIES["PHPSESSID"] = new_session
+        return "REFRESH", new_token
+    
+    else: 
+        print("\n⚠️ Geçersiz seçim yapıldı, program kapatılıyor...")
+        time.sleep(3)
+        return "EXIT", None
+
 
 # ============================
 # INPUTS
@@ -41,25 +79,32 @@ def ask_sessionid():
 
 def ask_sprint_planning_days():
     raw = input(
-        "📌 Sprint planning perşembeleri (ayın kaçıncı perşembeleri? örn: 1,3): "
+        "📌 Sprint planlama günlerin (ayın kaçında? örn: 1,3 | boş = yok): "
     )
+    if not raw:
+        return set()
+    
     return {int(x.strip()) for x in raw.split(",")}
 
 def ask_leave_days():
     raw = input(
-        "📌 İzinli günlerin (ayın kaçında? örn: 1,3): "
+        "📌 İzinli günlerin (ayın kaçında? örn: 1,3 | boş = yok): "
     )
+    if not raw:
+        return set()
     return {int(x.strip()) for x in raw.split(",")}
 
 def ask_office_days():
     raw = input(
-        "📌 Ofis günlerin (ayın kaçında? örn: 1,3): "
+        "📌 Ofis günlerin (ayın kaçında? örn: 1,3 | boş = yok): "
     )
+    if not raw:
+        return set()
     return {int(x.strip()) for x in raw.split(",")}
 
 
 def ask_start_day():
-    raw = input("▶️ Kaçıncı günden başlansın? (boş = ayın başı): ").strip()
+    raw = input("▶️ Zaman girişi kaçıncı günden başlansın? (boş = ay başı): ").strip()
     return int(raw) if raw else 1
 
 def ask_descriptions(date_obj):
@@ -76,7 +121,6 @@ def ask_descriptions(date_obj):
 # ============================
 def create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, office_days):
     date_str = date_obj.strftime("%Y-%m-%d")
-    responses = []
 
     is_leave_day = date_obj.day in leave_days
     is_office_day = date_obj.day in office_days
@@ -93,8 +137,7 @@ def create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, 
     # 🟣 Sprint Planning
     elif is_planning_day:
         intervals = [
-            ("09:00", "18:00", DEFAULT_DATA["activity"],
-            "Sprint Review + Sprint Planlama + Retrospective")
+            ("09:00", "18:00", 7, "Sprint Review + Sprint Planlama + Retrospective")
         ]
 
     # 🟡 Leave
@@ -112,6 +155,7 @@ def create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, 
             ("13:00", "18:00", DEFAULT_DATA["activity"], desc_map[("13:00", "18:00")]),
         ]
 
+    error_count = 0
     # POST
     for start, end, activity, description in intervals:
         # ✅ Bugün ve 13-18 aralığıysa ekle
@@ -135,17 +179,40 @@ def create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, 
             "timesheet_edit_form[_token]": token
         }
 
-        print(f'{payload["timesheet_edit_form[begin]"]} + {payload["timesheet_edit_form[end]"]} zaman dilimi oluşturuldu!')
-        r = requests.post(
+        success = False
+        while not success:
+            r = requests.post(
                 KIMAI_URL,
                 headers=HEADERS,
                 cookies=COOKIES,
                 data=payload
             )
 
-        responses.append((payload["timesheet_edit_form[begin]"], payload["timesheet_edit_form[end]"]))
+            if r.status_code == 200:
+                success = True
+                error_count = 0  # ✅ başarı → hata sayacı reset
+                print(f'{payload["timesheet_edit_form[begin]"]} + {payload["timesheet_edit_form[end]"]} zaman dilimi oluşturuldu!')
+                break
 
-    return responses
+            
+            error_count += 1
+
+            # 3 hata olduysa otomatik çık
+            if error_count >= MAX_ERROR_COUNT:
+                print("\n⛔ Üst üste çok fazla hata alındı.")
+                print("⏳ Program 3 saniye içinde sonlandırılacak...")
+                return "EXIT"
+
+            action, new_token = handle_auth_error(payload, r)
+
+            if action == "REFRESH":
+                payload["timesheet_edit_form[_token]"] = new_token
+                continue  # 🔁 yeni token ve session id ile isteği yeniden dene
+
+            elif action == "EXIT":
+                return action  # sadece fonksiyondan çık
+
+    return "OK"
 
 # ============================
 # MONTH
@@ -165,7 +232,9 @@ def create_timesheets_for_current_month(token, sprint_planning_days, leave_days,
         # hafta içi
         if date_obj.weekday() <= 4:
             print(f"\n📅 {date_obj.strftime('%Y-%m-%d')}")
-            create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, office_days)
+            result = create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, office_days)
+
+            if result == "EXIT": return
 
     print("\n✅ Helal olsun bir ayı daha tamamladın!")
     
@@ -176,13 +245,18 @@ def create_timesheets_for_current_month(token, sprint_planning_days, leave_days,
 # MAIN
 # ============================
 if __name__ == "__main__":
-    start_day = ask_start_day()
+    try:
+        print("🚀 Kimai Zaman Girişi Scripti Başladı!\n")
+        start_day = ask_start_day()
 
-    token = ask_token()
-    phpsessionid = ask_sessionid()
-    COOKIES["PHPSESSID"] = phpsessionid
+        token = ask_token()
+        phpsessionid = ask_sessionid()
+        COOKIES["PHPSESSID"] = phpsessionid
 
-    sprint_planning_days = ask_sprint_planning_days()
-    leave_days = ask_leave_days()
-    office_days = ask_office_days()
-    create_timesheets_for_current_month(token, sprint_planning_days, leave_days, office_days, start_day)
+        sprint_planning_days = ask_sprint_planning_days()
+        leave_days = ask_leave_days()
+        office_days = ask_office_days()
+        create_timesheets_for_current_month(token, sprint_planning_days, leave_days, office_days, start_day)
+
+    except KeyboardInterrupt:
+        sys.exit(0)
