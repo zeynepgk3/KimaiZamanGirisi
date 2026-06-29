@@ -37,7 +37,6 @@ tr_holidays = holidays.Turkey(years=datetime.now().year)
 # ERROR HANDLING
 # ============================
 def handle_auth_error(payload, r):
-
     print(
         f"\n❌ {payload['timesheet_edit_form[begin]']} - "
         f"{payload['timesheet_edit_form[end]']} zaman dilimi eklenemedi! "
@@ -102,6 +101,33 @@ def ask_office_days():
         return set()
     return {int(x.strip()) for x in raw.split(",")}
 
+def ask_start_month():
+    raw = input("▶️ Zaman girişi kaçıncı ay için başlasın? (boş = bulunduğun ay): ").strip()
+    current_month = datetime.now().month
+    return int(raw) if raw else current_month
+
+def ask_activity():
+    # ✅ Geliştirme: Seçilen aktivite id'sini döner, boşsa DEFAULT_DATA'daki aktiviteyi kullanır.
+    raw = input("▶️ Tüm ay geçerli olacak aktiviteyi seçin? (Geliştirme = 1, Test = 2, Teknik Analiz = 22, Eğitim = 5 | Boş = Varsayılan): ").strip()
+    return int(raw) if raw else DEFAULT_DATA["activity"]
+
+def confirm_description(description):
+    # ✅ Geliştirme: Kullanıcıya girilen açıklamayı onaylatır.
+    print(f"\n📝 Girilen Genel Açıklama: \"{description}\"")
+    choice = input("👉 Bu açıklamayı onaylıyor musunuz? (E/H): ").strip().upper()
+    return choice == 'E'
+
+def ask_general_description():
+    # ✅ Geliştirme: Genel açıklama alır ve onay mekanizmasını tetikler.
+    while True:
+        raw = input("▶️ Tüm ay geçerli olacak açıklama metnini giriniz? (Boş ise her gün için ayrı sorulacak): ").strip()
+        if not raw:
+            return None
+        
+        if confirm_description(raw):
+            return raw
+        else:
+            print("🔄 Açıklama reddedildi. Lütfen tekrar girin veya boş bırakın.\n")
 
 def ask_start_day():
     raw = input("▶️ Zaman girişi kaçıncı günden başlansın? (boş = ay başı): ").strip()
@@ -109,7 +135,6 @@ def ask_start_day():
 
 def ask_descriptions(date_obj):
     print(f"\n📝 {date_obj.strftime('%Y-%m-%d')} tarihi açıklamaları:")
-    
     return {
         ("09:00", "12:00"): "Daily Toplantısı, " + input("  09:00–12:00: "),
         ("13:00", "18:00"): input("  13:00–18:00: ")
@@ -119,7 +144,7 @@ def ask_descriptions(date_obj):
 # ============================
 # CREATE DAY
 # ============================
-def create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, office_days):
+def create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, office_days, activity_id, general_desc):
     date_str = date_obj.strftime("%Y-%m-%d")
 
     is_leave_day = date_obj.day in leave_days
@@ -146,18 +171,27 @@ def create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, 
             ("09:00", "18:00", 12, "İzinli")
         ]
         print(f"İznin sisteme işlendi. Umarım dinlenebilmişsindir. 🌸")
+    
     # 🟢 Normal
     else:
-        desc_map = ask_descriptions(date_obj)
+        # ✅ Geliştirme: Eğer genel açıklama varsa sormadan kullan, yoksa tek tek sor.
+        if general_desc:
+            desc_map = {
+                ("09:00", "12:00"): f"Daily Toplantısı, {general_desc}",
+                ("13:00", "18:00"): general_desc
+            }
+        else:
+            desc_map = ask_descriptions(date_obj)
+
         intervals = [
-            ("09:00", "12:00", DEFAULT_DATA["activity"], desc_map[("09:00", "12:00")]),
+            ("09:00", "12:00", activity_id, desc_map[("09:00", "12:00")]),
             ("12:00", "13:00", 30, ""),
-            ("13:00", "18:00", DEFAULT_DATA["activity"], desc_map[("13:00", "18:00")]),
+            ("13:00", "18:00", activity_id, desc_map[("13:00", "18:00")]),
         ]
 
     error_count = 0
     # POST
-    for start, end, activity, description in intervals:
+    for start, end, act, description in intervals:
         # ✅ Bugün ve 13-18 aralığıysa ekle
         if date_obj.date() == TODAY and start == "13:00" and end == "18:00":
             description += ", Kimai Zaman Girişi"
@@ -173,7 +207,7 @@ def create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, 
             "timesheet_edit_form[duration]": "",
             "timesheet_edit_form[customer]": DEFAULT_DATA["customer"],
             "timesheet_edit_form[project]": DEFAULT_DATA["project"],
-            "timesheet_edit_form[activity]": activity,
+            "timesheet_edit_form[activity]": act,
             "timesheet_edit_form[description]": description,
             "timesheet_edit_form[tags]": tags,
             "timesheet_edit_form[_token]": token
@@ -194,7 +228,6 @@ def create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, 
                 print(f'{payload["timesheet_edit_form[begin]"]} + {payload["timesheet_edit_form[end]"]} zaman dilimi oluşturuldu!')
                 break
 
-            
             error_count += 1
 
             # 3 hata olduysa otomatik çık
@@ -217,10 +250,15 @@ def create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, 
 # ============================
 # MONTH
 # ============================
-def create_timesheets_for_current_month(token, sprint_planning_days, leave_days, office_days, start_day):
-    today = datetime.now()
-    year = today.year
-    month = today.month
+def create_timesheets_for_month(token, sprint_planning_days, leave_days, office_days, start_day, start_month, activity_id, general_desc):
+    if start_month:
+        selected_month_first_day = datetime(datetime.now().year, start_month, 1)
+        month = selected_month_first_day.month
+        year = selected_month_first_day.year    
+    else:
+        today = datetime.now()
+        year = today.year
+        month = today.month
 
     num_days = calendar.monthrange(year, month)[1]
 
@@ -232,7 +270,7 @@ def create_timesheets_for_current_month(token, sprint_planning_days, leave_days,
         # hafta içi
         if date_obj.weekday() <= 4:
             print(f"\n📅 {date_obj.strftime('%Y-%m-%d')}")
-            result = create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, office_days)
+            result = create_timesheet_for_day(date_obj, token, sprint_planning_days, leave_days, office_days, activity_id, general_desc)
 
             if result == "EXIT": return
 
@@ -247,7 +285,11 @@ def create_timesheets_for_current_month(token, sprint_planning_days, leave_days,
 if __name__ == "__main__":
     try:
         print("🚀 Kimai Zaman Girişi Scripti Başladı!\n")
+        
+        start_month = ask_start_month()
         start_day = ask_start_day()
+        activity_id = ask_activity()
+        general_desc = ask_general_description() # ✅ Geliştirme
 
         token = ask_token()
         phpsessionid = ask_sessionid()
@@ -256,7 +298,11 @@ if __name__ == "__main__":
         sprint_planning_days = ask_sprint_planning_days()
         leave_days = ask_leave_days()
         office_days = ask_office_days()
-        create_timesheets_for_current_month(token, sprint_planning_days, leave_days, office_days, start_day)
+        
+        create_timesheets_for_month(
+            token, sprint_planning_days, leave_days, office_days, 
+            start_day, start_month, activity_id, general_desc
+        )
 
     except KeyboardInterrupt:
         sys.exit(0)

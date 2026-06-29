@@ -1,0 +1,328 @@
+[
+    {
+        "user": 189,
+        "tags": [
+            "@ev"
+        ],
+        "id": 85213,
+        "begin": "2026-05-29T09:00:00+0000",
+        "end": "2026-05-29T18:00:00+0000",
+        "duration": 32400,
+        "activity": {
+            "id": 14,
+            "project": null,
+            "name": "Resmi Tatil",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "project": {
+            "id": 68,
+            "customer": {
+                "id": 11,
+                "name": "Yap\u0131 Kredi Bankas\u0131",
+                "visible": true,
+                "color": "#d2d6de"
+            },
+            "name": "Yap\u0131 Kredi Teknoloji",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "description": "Eid al-Adha",
+        "rate": 0.0,
+        "internalRate": 0.0,
+        "metaFields": []
+    },
+    {
+        "user": 189,
+        "tags": [
+            "@ev"
+        ],
+        "id": 85210,
+        "begin": "2026-05-26T13:00:00+0000",
+        "end": "2026-05-26T18:00:00+0000",
+        "duration": 18000,
+        "activity": {
+            "id": 1,
+            "project": null,
+            "name": "Geli\u015ftirme",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "project": {
+            "id": 68,
+            "customer": {
+                "id": 11,
+                "name": "Yap\u0131 Kredi Bankas\u0131",
+                "visible": true,
+                "color": "#d2d6de"
+            },
+            "name": "Yap\u0131 Kredi Teknoloji",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "description": "i\u015fletme segment teknik analiz + geli\u015ftirme",
+        "rate": 0.0,
+        "internalRate": 0.0,
+        "metaFields": []
+    },
+    {
+        "user": 189,
+        "tags": [
+            "@ev"
+        ],
+        "id": 85209,
+        "begin": "2026-05-26T12:00:00+0000",
+        "end": "2026-05-26T13:00:00+0000",
+        "duration": 3600,
+        "activity": {
+            "id": 30,
+            "project": null,
+            "name": "\u00d6\u011fle Aras\u0131",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "project": {
+            "id": 68,
+            "customer": {
+                "id": 11,
+                "name": "Yap\u0131 Kredi Bankas\u0131",
+                "visible": true,
+                "color": "#d2d6de"
+            },
+            "name": "Yap\u0131 Kredi Teknoloji",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "description": null,
+        "rate": 0.0,
+        "internalRate": 0.0,
+        "metaFields": []
+    },
+    {
+        "user": 189,
+        "tags": [
+            "@ev"
+        ],
+        "id": 85188,
+        "begin": "2026-05-14T09:00:00+0000",
+        "end": "2026-05-14T18:00:00+0000",
+        "duration": 32400,
+        "activity": {
+            "id": 7,
+            "project": null,
+            "name": "Toplant\u0131",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "project": {
+            "id": 68,
+            "customer": {
+                "id": 11,
+                "name": "Yap\u0131 Kredi Bankas\u0131",
+                "visible": true,
+                "color": "#d2d6de"
+            },
+            "name": "Yap\u0131 Kredi Teknoloji",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "description": "Sprint Review + Sprint Planlama + Retrospective",
+        "rate": 0.0,
+        "internalRate": 0.0,
+        "metaFields": []
+    },
+    {
+        "user": 189,
+        "tags": [
+            "@ev"
+        ],
+        "id": 84525,
+        "begin": "2026-04-03T09:00:00+0000",
+        "end": "2026-04-03T18:00:00+0000",
+        "duration": 32400,
+        "activity": {
+            "id": 12,
+            "project": null,
+            "name": "\u0130zin",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "project": {
+            "id": 68,
+            "customer": {
+                "id": 11,
+                "name": "Yap\u0131 Kredi Bankas\u0131",
+                "visible": true,
+                "color": "#d2d6de"
+            },
+            "name": "Yap\u0131 Kredi Teknoloji",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "description": "\u0130zinli",
+        "rate": 0.0,
+        "internalRate": 0.0,
+        "metaFields": []
+    },
+    {
+        "user": 189,
+        "tags": [
+            "@ev"
+        ],
+        "id": 81826,
+        "begin": "2026-02-19T09:00:00+0000",
+        "end": "2026-02-19T18:00:00+0000",
+        "duration": 32400,
+        "activity": {
+            "id": 10,
+            "project": null,
+            "name": "Sprint Planlama",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "project": {
+            "id": 68,
+            "customer": {
+                "id": 11,
+                "name": "Yap\u0131 Kredi Bankas\u0131",
+                "visible": true,
+                "color": "#d2d6de"
+            },
+            "name": "Yap\u0131 Kredi Teknoloji",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "description": "Sprint Review + Sprint Planlama + Retrospective",
+        "rate": 0.0,
+        "internalRate": 0.0,
+        "metaFields": []
+    },
+    {
+        "user": 189,
+        "tags": [
+            "@ev"
+        ],
+        "id": 75046,
+        "begin": "2025-11-08T11:00:00+0000",
+        "end": "2025-11-08T13:00:00+0000",
+        "duration": 7200,
+        "activity": {
+            "id": 2,
+            "project": null,
+            "name": "Test",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "project": {
+            "id": 68,
+            "customer": {
+                "id": 11,
+                "name": "Yap\u0131 Kredi Bankas\u0131",
+                "visible": true,
+                "color": "#d2d6de"
+            },
+            "name": "Yap\u0131 Kredi Teknoloji",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "description": "MDHE Live Ge\u00e7i\u015f Sonras\u0131 \u0130ncelemeler",
+        "rate": 0.0,
+        "internalRate": 0.0,
+        "metaFields": []
+    },
+    {
+        "user": 189,
+        "tags": [
+            "@ev"
+        ],
+        "id": 73200,
+        "begin": "2025-10-31T09:00:00+0000",
+        "end": "2025-10-31T17:00:00+0000",
+        "duration": 28800,
+        "activity": {
+            "id": 5,
+            "project": null,
+            "name": "E\u011fitim",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "project": {
+            "id": 68,
+            "customer": {
+                "id": 11,
+                "name": "Yap\u0131 Kredi Bankas\u0131",
+                "visible": true,
+                "color": "#d2d6de"
+            },
+            "name": "Yap\u0131 Kredi Teknoloji",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "description": "Yap\u0131kredi bilgi g\u00fcvenli\u011fi e\u011fitimi \r\nArcher validasyon bulgusu \u00e7\u00f6z\u00fcm\u00fcne devam",
+        "rate": 0.0,
+        "internalRate": 0.0,
+        "metaFields": []
+    },
+    {
+        "user": 189,
+        "tags": [],
+        "id": 67391,
+        "begin": "2025-08-04T13:00:00+0000",
+        "end": "2025-08-04T18:00:00+0000",
+        "duration": 18000,
+        "activity": {
+            "id": 17,
+            "project": null,
+            "name": "Ara\u015ft\u0131rma",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "project": {
+            "id": 68,
+            "customer": {
+                "id": 11,
+                "name": "Yap\u0131 Kredi Bankas\u0131",
+                "visible": true,
+                "color": "#d2d6de"
+            },
+            "name": "Yap\u0131 Kredi Teknoloji",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "description": "web yaz\u0131l\u0131m geli\u015ftirme s\u00fcre\u00e7lerini iyile\u015ftirme ara\u015ft\u0131rmas\u0131",
+        "rate": 0.0,
+        "internalRate": 0.0,
+        "metaFields": []
+    },
+    {
+        "user": 189,
+        "tags": [],
+        "id": 65639,
+        "begin": "2025-07-23T09:00:00+0000",
+        "end": "2025-07-23T12:00:00+0000",
+        "duration": 10800,
+        "activity": {
+            "id": 22,
+            "project": null,
+            "name": "Teknik Analiz",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "project": {
+            "id": 68,
+            "customer": {
+                "id": 11,
+                "name": "Yap\u0131 Kredi Bankas\u0131",
+                "visible": true,
+                "color": "#d2d6de"
+            },
+            "name": "Yap\u0131 Kredi Teknoloji",
+            "visible": true,
+            "color": "#d2d6de"
+        },
+        "description": "dailyler + collection task\u0131 i\u00e7in d\u00f6n\u00fc\u015ft\u00fcr\u00fclen servislerin hangi ekranlardan tetiklendi\u011fini ara\u015ft\u0131rd\u0131k",
+        "rate": 0.0,
+        "internalRate": 0.0,
+        "metaFields": []
+    }
+]
